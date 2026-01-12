@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Coach — Персональный Тренер</title>
+    <style>
+        :root {
+            --color-primary: #208090;
+            --color-primary-hover: #1a6b77;
+            --color-bg: #fefdf9;
+            --color-surface: #fffbf5;
+            --color-text: #134252;
+            --color-text-secondary: #626c7c;
+            --color-border: rgba(94, 82, 64, 0.2);
+            --color-success: #208090;
+            --color-warning: #a84d2f;
+            --color-card-bg: #fffbf5;
+            --radius-base: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 32px;
+            animation: slideDown 0.5s ease;
+        }
+
+        h1 {
+            margin: 0 0 8px 0;
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--color-text);
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: var(--color-card-bg);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--color-primary);
+        }
+
+        .card h2 {
+            margin: 0 0 16px 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--color-text);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--color-text);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            font-size: 14px;
+            font-family: inherit;
+            background: var(--color-surface);
+            color: var(--color-text);
+            transition: all 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(32, 128, 144, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: var(--radius-base);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: #fefdf9;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(32, 128, 144, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(94, 82, 64, 0.1);
+            color: var(--color-text);
+            border: 1px solid var(--color-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(94, 82, 64, 0.15);
+        }
+
+        .workout-result {
+            background: linear-gradient(135deg, rgba(32, 128, 144, 0.05), rgba(168, 77, 47, 0.02));
+            border: 2px solid var(--color-primary);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-top: 24px;
+            animation: slideUp 0.5s ease;
+        }
+
+        .workout-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0 0 16px 0;
+            color: var(--color-text);
+        }
+
+        .workout-meta {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            .workout-meta { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .meta-item {
+            background: var(--color-surface);
+            padding: 12px;
+            border-radius: var(--radius-base);
+            text-align: center;
+        }
+
+        .meta-label {
+            color: var(--color-text-secondary);
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .meta-value {
+            font-weight: 600;
+            color: var(--color-primary);
+            font-size: 16px;
+        }
+
+        .exercises-list {
+            margin-bottom: 20px;
+        }
+
+        .exercise-item {
+            background: var(--color-surface);
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-radius: var(--radius-base);
+            border-left: 4px solid var(--color-primary);
+            font-size: 14px;
+        }
+
+        .exercise-name {
+            font-weight: 600;
+            color: var(--color-text);
+            margin-bottom: 4px;
+        }
+
+        .exercise-details {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+        }
+
+        .timer-link-section {
+            background: rgba(32, 128, 144, 0.08);
+            padding: 16px;
+            border-radius: var(--radius-base);
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .timer-link-label {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .timer-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--color-primary);
+            color: #fefdf9;
+            padding: 12px 20px;
+            border-radius: var(--radius-base);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .timer-link:hover {
+            background: var(--color-primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(32, 128, 144, 0.3);
+        }
+
+        .timer-icon {
+            font-size: 16px;
+        }
+
+        .url-text {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            margin-top: 8px;
+            word-break: break-all;
+            background: var(--color-surface);
+            padding: 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            max-height: 60px;
+            overflow: auto;
+        }
+
+        .copy-btn {
+            padding: 8px 16px;
+            font-size: 13px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(94, 82, 64, 0.1);
+            border-color: var(--color-primary);
+        }
+
+        .copy-btn.copied {
+            background: rgba(32, 128, 144, 0.15);
+            color: var(--color-success);
+            border-color: var(--color-success);
+        }
+
+        .tips {
+            background: rgba(168, 77, 47, 0.08);
+            border-left: 4px solid var(--color-warning);
+            padding: 12px 16px;
+            border-radius: var(--radius-base);
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            margin-top: 16px;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--color-text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💪 Workout Coach Олега</h1>
+            <p class="subtitle">Персональный генератор тренировок с таймерами</p>
+        </header>
+
+        <div class="main-grid">
+            <!-- Left: Input Panel -->
+            <div class="card">
+                <h2>⚙️ Параметры тренировки</h2>
+                
+                <div class="form-group">
+                    <label for="energy">Уровень энергии сегодня:</label>
+                    <select id="energy">
+                        <option value="">Выберите...</option>
+                        <option value="full">На максимум 💥</option>
+                        <option value="ok">Нормально 👍</option>
+                        <option value="tired">Устал 😓</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="duration">Длительность (минут):</label>
+                    <select id="duration">
+                        <option value="30">30 минут</option>
+                        <option value="45">45 минут</option>
+                        <option value="60">60 минут</option>
+                        <option value="75">75 минут</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="focus">Акцент на группу мышц:</label>
+                    <select id="focus">
+                        <option value="fullbody">Фулл-боди (все мышцы)</option>
+                        <option value="upper">Верх (грудь, спина, плечи)</option>
+                        <option value="lower">Низ (ноги, ягодицы)</option>
+                        <option value="strength">Сила (тяжелые веса)</option>
+                        <option value="pump">Пампинг (много повторов)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="limitations">Ограничения (опционально):</label>
+                    <textarea id="limitations" placeholder="Например: болит спина, нет скамьи..."></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-primary" onclick="generateWorkout()">Генерировать тренировку! 🔥</button>
+                    <button class="btn-secondary" onclick="resetForm()">Очистить</button>
+                </div>
+            </div>
+
+            <!-- Right: Example/Guide -->
+            <div class="card">
+                <h2>ℹ️ Инструкция</h2>
+                <p style="margin: 0 0 12px 0; color: var(--color-text-secondary); font-size: 14px;">
+                    <strong>1.</strong> Выбери уровень энергии, длительность и фокус<br/>
+                    <strong>2.</strong> Нажми "Генерировать тренировку"<br/>
+                    <strong>3.</strong> Получишь список упражнений<br/>
+                    <strong>4.</strong> Открой таймер через кнопку или скопируй ссылку
+                </p>
+                
+                <div class="tips">
+                    <strong>💡 Советы:</strong><br/>
+                    • Базовый вес бицепса: 12 кг<br/>
+                    • Отдых между упражнениями: 30 сек<br/>
+                    • Отдых между раундами: 90 сек<br/>
+                    • Всегда заканчиваем стретчингом
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // Валидация JSON и кодирование в base64 (с защитой для мобильных)
+        function encodeWorkoutLink(workoutObj) {
+            try {
+                const jsonStr = JSON.stringify(workoutObj);
+                let encoded;
+                
+                // Попытка использовать современный метод
+                if (typeof TextEncoder !== 'undefined') {
+                    const encoder = new TextEncoder();
+                    const uint8 = encoder.encode(jsonStr);
+                    let binary = '';
+                    for (let i = 0; i < uint8.length; i++) {
+                        binary += String.fromCharCode(uint8[i]);
+                    }
+                    encoded = btoa(binary);
+                } else {
+                    // Fallback для старых браузеров
+                    encoded = btoa(unescape(encodeURIComponent(jsonStr)));
+                }
+                
+                return `https://workout-timer.app/timer?w=${encoded}`;
+            } catch (err) {
+                console.error("❌ Ошибка кодирования URL:", err);
+                alert("⚠️ Ошибка при создании ссылки. Попробуй ещё раз.");
+                throw err;
+            }
+        }
+
+        // Банк упражнений по категориям
+        const exerciseBank = {
+            chest: [
+                { name: "Жим гантелей лёжа", reps: "x10", duration: 60, weight: "10kg each", equipment: "dumbbells" },
+                { name: "Жим штанги на наклонной скамье", reps: "x8", duration: 60, weight: "20kg", equipment: "barbell" },
+                { name: "Разведение гантелей лёжа", reps: "x12", duration: 50, weight: "8kg", equipment: "dumbbells" }
+            ],
+            back: [
+                { name: "Тяга горизонтального блока", reps: "x12", duration: 60, weight: "14kg", equipment: "cable" },
+                { name: "Подтягивания", reps: "x8", duration: 45, weight: "0kg", equipment: "pullup bar" },
+                { name: "Тяга штанги в наклоне", reps: "x10", duration: 60, weight: "20kg", equipment: "barbell" }
+            ],
+            shoulders: [
+                { name: "Жим гантелей над головой", reps: "x10", duration: 60, weight: "10kg each", equipment: "dumbbells" },
+                { name: "Боковые разведения", reps: "x12", duration: 50, weight: "6kg each", equipment: "dumbbells" },
+                { name: "Шраги со штангой", reps: "x12", duration: 50, weight: "20kg", equipment: "barbell" }
+            ],
+            legs: [
+                { name: "Гоблет-присед", reps: "x12", duration: 60, weight: "18kg", equipment: "dumbbell" },
+                { name: "Жим ногами в тренажёре", reps: "x12", duration: 60, weight: "80kg", equipment: "machine" },
+                { name: "Выпады с гантелями", reps: "x10 each", duration: 60, weight: "10kg each", equipment: "dumbbells" }
+            ],
+            arms: [
+                { name: "Сгибания на бицепс", reps: "x12", duration: 60, weight: "12kg", equipment: "dumbbells" },
+                { name: "Разгибания на трицепс (канат)", reps: "x12", duration: 60, weight: "14kg", equipment: "cable" },
+                { name: "Молотки", reps: "x12", duration: 60, weight: "10kg each", equipment: "dumbbells" }
+            ]
+        };
+
+        // Логика выбора упражнений (с защитой для мобильных)
+        function selectExercises(focus, duration, energy) {
+            try {
+                let exercises = [];
+                let count = Math.ceil(duration / 15) || 3;
+                
+                // Убедимся, что exerciseBank инициализирован
+                if (!exerciseBank || typeof exerciseBank !== 'object') {
+                    console.error("❌ Банк упражнений не инициализирован");
+                    return getDefaultExercises();
+                }
+
+                const getRandomExercise = (group) => {
+                    if (!exerciseBank[group] || !Array.isArray(exerciseBank[group])) {
+                        console.warn(`⚠️ Группа "${group}" не найдена`);
+                        return null;
+                    }
+                    const idx = Math.floor(Math.random() * exerciseBank[group].length);
+                    return exerciseBank[group][idx] || null;
+                };
+
+                if (focus === "fullbody") {
+                    ["chest", "back", "shoulders", "legs", "arms"].forEach(group => {
+                        const ex = getRandomExercise(group);
+                        if (ex) exercises.push(ex);
+                    });
+                } else if (focus === "upper") {
+                    ["chest", "back", "shoulders"].forEach(group => {
+                        const ex = getRandomExercise(group);
+                        if (ex) exercises.push(ex);
+                    });
+                    if (exerciseBank.arms && exerciseBank.arms[0]) {
+                        exercises.push(exerciseBank.arms[0]);
+                    }
+                } else if (focus === "lower") {
+                    if (exerciseBank.legs && Array.isArray(exerciseBank.legs)) {
+                        exercises.push(...exerciseBank.legs);
+                    }
+                } else if (focus === "strength") {
+                    exercises = [
+                        { name: "Жим штанги на наклонной скамье", reps: "x6", duration: 60, weight: "25kg", equipment: "barbell" },
+                        { name: "Тяга штанги в наклоне", reps: "x6", duration: 60, weight: "25kg", equipment: "barbell" },
+                        { name: "Жим ногами в тренажёре", reps: "x8", duration: 60, weight: "100kg", equipment: "machine" }
+                    ];
+                } else if (focus === "pump") {
+                    exercises = [
+                        { name: "Разведение гантелей лёжа", reps: "x15", duration: 50, weight: "6kg", equipment: "dumbbells" },
+                        { name: "Разгибания на трицепс (канат)", reps: "x15", duration: 50, weight: "10kg", equipment: "cable" },
+                        { name: "Сгибания на бицепс", reps: "x15", duration: 60, weight: "10kg", equipment: "dumbbells" }
+                    ];
+                }
+
+                if (exercises.length === 0) {
+                    return getDefaultExercises();
+                }
+                
+                return exercises.slice(0, Math.max(2, count));
+            } catch (err) {
+                console.error("❌ Ошибка при выборе упражнений:", err);
+                return getDefaultExercises();
+            }
+        }
+        
+        // Упражнения по умолчанию (fallback)
+        function getDefaultExercises() {
+            return [
+                { name: "Жим гантелей лёжа", reps: "x10", duration: 60, weight: "10kg each", equipment: "dumbbells" },
+                { name: "Тяга горизонтального блока", reps: "x12", duration: 60, weight: "14kg", equipment: "cable" },
+                { name: "Гоблет-присед", reps: "x12", duration: 60, weight: "18kg", equipment: "dumbbell" }
+            ];
+        }
+
+        // Основная функция генерации (с защитой для мобильных)
+        function generateWorkout() {
+            try {
+                console.log("🔄 Начинаю генерацию тренировки...");
+                
+                const energy = document.getElementById("energy").value;
+                const duration = parseInt(document.getElementById("duration").value);
+                const focus = document.getElementById("focus").value;
+                const limitations = document.getElementById("limitations").value;
+
+                console.log("✓ Параметры:", { energy, duration, focus });
+
+                if (!energy || energy === "") {
+                    alert("⚠️ Пожалуйста, выбери уровень энергии!");
+                    return;
+                }
+
+                if (isNaN(duration) || duration < 30) {
+                    alert("⚠️ Выбери корректную длительность!");
+                    return;
+                }
+
+                const exercises = selectExercises(focus, duration, energy);
+                
+                if (!exercises || exercises.length === 0) {
+                    console.error("❌ Упражнения не выбраны");
+                    alert("⚠️ Ошибка при выборе упражнений. Попробуй ещё раз.");
+                    return;
+                }
+                
+                console.log("✓ Выбрано упражнений:", exercises.length);
+
+            const rounds = energy === "full" ? 3 : energy === "ok" ? 2 : 1;
+            const restEx = energy === "full" ? 20 : energy === "ok" ? 30 : 45;
+            const restRound = energy === "full" ? 60 : 90;
+
+            const focusName = focus === "fullbody" ? "Фулл-боди" : 
+                            focus === "upper" ? "Верх" : 
+                            focus === "lower" ? "Низ" : 
+                            focus === "strength" ? "Силовая" : "Пампинг";
+            
+            const workout = {
+                name: `${focusName} (${duration} мин)`,
+                rounds: rounds,
+                restEx: restEx,
+                restRound: restRound,
+                cooldown: true,
+                lang: "ru",
+                tracker: "apple",
+                exercises: exercises
+            };
+
+            console.log("✓ Объект тренировки создан");
+            
+            try {
+                const timerUrl = encodeWorkoutLink(workout);
+                console.log("✓ Ссылка на таймер создана");
+                displayResults(workout, timerUrl, duration, limitations);
+            } catch (err) {
+                console.error("❌ Ошибка при создании ссылки:", err);
+                alert("⚠️ Не удалось создать ссылку на таймер.");
+            }
+            } catch (err) {
+                console.error("❌ Ошибка при генерации тренировки:", err);
+                alert("⚠️ Ошибка при генерации тренировки. Проверь консоль браузера.");
+            }
+        }
+
+        // Отображение результатов
+        function displayResults(workout, timerUrl, duration, limitations) {
+            const totalExercises = workout.exercises.length;
+
+            let html = `
+                <div class="workout-result">
+                    <h3 class="workout-title">✅ Тренировка готова!</h3>
+                    
+                    <div class="workout-meta">
+                        <div class="meta-item">
+                            <div class="meta-label">Раунды</div>
+                            <div class="meta-value">${workout.rounds}</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Упражнения</div>
+                            <div class="meta-value">${totalExercises}</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Отдых упр.</div>
+                            <div class="meta-value">${workout.restEx}s</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Отдых раунда</div>
+                            <div class="meta-value">${workout.restRound}s</div>
+                        </div>
+                    </div>
+
+                    <h4 style="margin: 16px 0 12px 0; color: var(--color-text); font-size: 14px; font-weight: 600;">📋 Упражнения:</h4>
+                    <div class="exercises-list">
+                        ${workout.exercises.map((ex, idx) => `
+                            <div class="exercise-item">
+                                <div class="exercise-name">${idx + 1}. ${ex.name}</div>
+                                <div class="exercise-details">
+                                    ${ex.reps} • ${ex.duration}s • Вес: ${ex.weight} • ${ex.equipment}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="timer-link-section">
+                        <span class="timer-link-label">⏱️ Открыть интерактивный таймер:</span>
+                        <a href="${timerUrl}" target="_blank" rel="noopener noreferrer" class="timer-link">
+                            <span class="timer-icon">⏰</span>
+                            Запустить таймер в новой вкладке
+                        </a>
+                        <div class="url-text" id="url-display-${Math.random()}">${timerUrl.substring(0, 70)}...</div>
+                        <button class="copy-btn" data-url="${timerUrl}" onclick="copyToClipboard(this)">📋 Скопировать ссылку</button>
+                    </div>
+
+                    <div class="tips">
+                        <strong>🎯 Советы по выполнению:</strong><br/>
+                        • Разминка 5-10 минут перед началом<br/>
+                        • Контролируй вес и технику<br/>
+                        • Не спеши между упражнениями<br/>
+                        • Завершай стретчингом 5 минут
+                    </div>
+                </div>
+            `;
+
+            document.getElementById("results").innerHTML = html;
+            
+            // Прокрутка с защитой для мобильных браузеров
+            try {
+                const resultsDiv = document.getElementById("results");
+                if (resultsDiv) {
+                    setTimeout(() => {
+                        resultsDiv.scrollIntoView({ behavior: "auto" });
+                    }, 100);
+                }
+            } catch (err) {
+                console.warn("⚠️ Прокрутка не сработала:", err);
+                // Fallback - просто устанавливаем scroll
+                window.scrollTo(0, document.getElementById("results").offsetTop - 100);
+            }
+        }
+
+        // ✅ ФУНКЦИЯ КОПИРОВАНИЯ С FALLBACK (работает везде!)
+        function copyToClipboard(btn) {
+            const text = btn.getAttribute('data-url');
+            
+            if (!text) {
+                console.error("❌ URL не найден");
+                alert("⚠️ Ошибка: ссылка не найдена");
+                return;
+            }
+
+            console.log("📋 Копирование ссылки:", text.substring(0, 50) + "...");
+
+            // Попытка 1: Современный Clipboard API (HTTPS, HTTPS localhost)
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text)
+                    .then(() => {
+                        showCopySuccess(btn);
+                    })
+                    .catch((err) => {
+                        console.warn("Clipboard API не сработал, используем fallback:", err);
+                        fallbackCopy(text, btn);
+                    });
+            } else {
+                // Попытка 2: Старый способ (для старых браузеров и мобильных)
+                fallbackCopy(text, btn);
+            }
+        }
+
+        // Fallback копирование (работает везде)
+        function fallbackCopy(text, btn) {
+            try {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                textarea.style.pointerEvents = 'none';
+                document.body.appendChild(textarea);
+                textarea.focus();
+                textarea.select();
+                
+                const successful = document.execCommand('copy');
+                document.body.removeChild(textarea);
+                
+                if (successful) {
+                    console.log("✅ Fallback копирование сработало");
+                    showCopySuccess(btn);
+                } else {
+                    console.error("❌ Fallback копирование не сработало");
+                    showCopyError(btn);
+                }
+            } catch (err) {
+                console.error("❌ Ошибка fallback копирования:", err);
+                showCopyError(btn);
+            }
+        }
+
+        // Показать успех копирования
+        function showCopySuccess(btn) {
+            btn.textContent = "✅ Скопировано в буфер обмена!";
+            btn.classList.add("copied");
+            btn.style.background = "rgba(32, 128, 144, 0.2)";
+            btn.style.borderColor = "var(--color-success)";
+            btn.style.color = "var(--color-success)";
+            
+            setTimeout(() => {
+                btn.textContent = "📋 Скопировать ссылку";
+                btn.classList.remove("copied");
+                btn.style.background = "";
+                btn.style.borderColor = "";
+                btn.style.color = "";
+            }, 2500);
+        }
+
+        // Показать ошибку копирования
+        function showCopyError(btn) {
+            btn.textContent = "⚠️ Ошибка копирования";
+            btn.style.background = "rgba(192, 21, 47, 0.15)";
+            btn.style.borderColor = "#c01530";
+            btn.style.color = "#c01530";
+            
+            setTimeout(() => {
+                btn.textContent = "📋 Скопировать ссылку";
+                btn.style.background = "";
+                btn.style.borderColor = "";
+                btn.style.color = "";
+            }, 2500);
+        }
+
+        // Очистка формы
+        function resetForm() {
+            document.getElementById("energy").value = "";
+            document.getElementById("duration").value = "30";
+            document.getElementById("focus").value = "fullbody";
+            document.getElementById("limitations").value = "";
+            document.getElementById("results").innerHTML = "";
+        }
+    </script>
+</body>
+</html>
